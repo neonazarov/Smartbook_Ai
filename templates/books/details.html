@@ -1,0 +1,84 @@
+{% extends 'layouts/base.html' %}
+
+{% load custom_tags %}
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="page-content">
+
+        <!-- ***** Featured Start ***** -->
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="feature-banner header-text">
+              <div class="container">
+                <img src="{{ book.cover_image.url }}" alt="" style="border-radius: 23px;">
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- ***** Featured End ***** -->
+
+        <!-- ***** Details Start ***** -->
+        <div class="game-details">
+          <div class="row">
+            <div class="col-lg-12">
+              <h2>Book Details</h2>
+            </div>
+            <div class="col-lg-12">
+              <div class="content">
+                  <div class="col-lg-12">
+                    <p>{{ book.description }}</p>
+                    <p>Published date: {{ book.publication_date }}</p>
+                    <p>Pages: {{ book.pages }}</p>
+                    <p>ISBN: {{ book.isbn }}</p>
+                    <p>Price: {{ book.price|dot_thousands }} SUM</p>
+                    <p>Categories:
+                      {% for category in book.categories.all %}
+                          <span>{{ category.name }}, </span>
+                      {% endfor %}
+                  </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- ***** Details End ***** -->
+
+        <!-- ***** Other Start ***** -->
+        <div class="other-games">
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="heading-section">
+                <h4><em>Other Related</em> Books</h4>
+              </div>
+            </div>
+            {% for related in related_books %}
+              <div class="col-lg-6">
+                <div class="item">
+                  <img src="{{ related.cover_image.url }}" alt="" class="templatemo-item">
+                  <h4><a href="{% url 'books:detail' book_id=related.id %}">{{ related.title }}</a></h4><span>{{ related.author.first_name }} {{ related.author.last_name }}</span>
+                  {% is_in_wishlist related.id as in_library %}
+                  {% if in_library %}
+                    <a href="{% url 'books:add_to_wishlist' book_id=related.id %}">
+                      <li style="color: azure;">- Remove from library</li>
+                  </a>
+                  {% else %}
+                      <a href="{% url 'books:add_to_wishlist' book_id=related.id %}">
+                          <li style="color: azure;">+ Add to library</li>
+                      </a>
+                  {% endif %}
+                </div>
+              </div>
+            {% endfor %}
+            </div>
+          </div>
+        </div>
+        <!-- ***** Other End ***** -->
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+{% load custom_tags %}
+{% block content %}
+<style>
+  .item h4 {
+    font-size: 16px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.book-cover-container {
+    display: grid;
+    place-items: center;
+}
+
+.book-cover {
+    width: 200px;
+    height: 300px;
+    object-fit: cover;
+}
+</style>
+<div class="container">
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="page-content">
+        <!-- ***** Most Popular Start ***** -->
+        <div class="most-popular">
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="heading-section">
+                <h4><em>Your Loved Books</em> Library</h4>
+              </div>
+              <div class="row">
+                {% comment %} First four popular books {% endcomment %}
+                  {% for wishlist in wishlists %}
+                  <div class="col-lg-3 col-sm-6">
+                    <div class="item">
+                      <div class="book-cover-container">
+                        <img src="{{ wishlist.book.cover_image.url }}" alt="Cover" class="book-cover">
+                      </div>
+                      <h4><a href="{% url 'books:detail' book_id=wishlist.book.id %}">{{ wishlist.book.title|truncatechars:30 }}</a><br><span>
+                      {% is_in_wishlist wishlist.book.id as in_library %}
+                      {% if in_library %}
+                        <a href="{% url 'books:add_to_wishlist' book_id=wishlist.book.id %}">
+                          <li style="color: azure;">- Remove from library</li>
+                      </a>
+                      {% else %}
+                          <a href="{% url 'books:add_to_wishlist' book_id=wishlist.book.id %}">
+                              <li style="color: azure;">+ Add to library</li>
+                          </a>
+                      {% endif %}
+                        {% for category in wishlist.book.categories.all %}
+                            {{ category.name }}, 
+                        {% endfor %}
+                      </span></h4>
+                    </div>
+                  </div>
+                  {% endfor %}
+                <div class="col-lg-12">
+                  <div class="main-button">
+                    <a href="{% url 'books:home' %}">Back to main page</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- ***** Most Popular End ***** -->
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

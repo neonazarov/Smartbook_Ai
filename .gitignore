@@ -1,0 +1,61 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.db
+# *.sqlite3
+*.egg-info/
+dist/
+build/
+*.egg
+
+# FastAPI
+instance/
+.venv/
+.env
+.env.local
+*.local
+
+# Django
+*.log
+*.pot
+*.pyc
+*.sqlite3
+media/
+staticfiles/
+*.log
+*.pot
+*.pyc
+*.coverage
+.coverage.*
+htmlcov/
+*.mo
+*.pyd
+*.db
+
+# Poetry
+poetry.lock
+pyproject.toml
+
+# IDEs and editors
+.vscode/
+.idea/
+*.swp
+
+backups/
+venv/
+venv
+logs/
+
+# Static files
+static/
+/static/
+**/static/
+migrations/
+migrations
+/migrations/
+celerybeat-schedule
+celerybeat-schedule.*
+celerybeat.pid
+celerybeat.pid.*

@@ -1,0 +1,64 @@
+{% extends 'layouts/base.html' %}
+
+{% load custom_tags %}
+{% block content %}
+<style>
+  .item h4 {
+    font-size: 16px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+  .book-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  .book-card {
+    border: 1px solid #ccc;
+    padding: 10px;
+    width: 200px;
+    background-color: #f9f9f9;
+  }
+  .book-card img {
+    max-width: 100%;
+    height: auto;
+  }
+  </style>
+  
+<div class="container">
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="page-content">
+        <!-- ***** Details Start ***** -->
+        <div class="game-details">
+          <div class="row">
+            <div class="col-lg-12">
+              <h2>Recommendation for you</h2>
+            </div>
+            <div class="col-lg-12">
+              <div class="content">
+                  <div class="col-lg-12">
+                    <div class="book-grid">
+                      {% for book in response %}
+                        <div class="book-card">
+                          <img src="{{ book.cover_url }}" alt="{{ book.title|truncatechars:30 }}" width="120">
+                          <h4 style="color: black;">{{ book.title }}</h4>
+                          <p><strong>Author:</strong> {{ book.author }}</p>
+                          <p><strong>Genre:</strong> {{ book.genre }}</p>
+                          <p>{{ book.summary }}</p>
+                        </div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- ***** Details End ***** -->
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
