@@ -1,4 +1,5 @@
 import json
+import random
 from django.db import IntegrityError
 from django.shortcuts import get_object_or_404, redirect, render
 
@@ -13,6 +14,8 @@ from utils.ai import get_gpt_response
 # Create your views here.
 def home(request):
     q = request.GET.get('q')
+    recommended_book = request.session.get('recommended_book')
+    print('session data: ', recommended_book)
     if q:
         books = Book.objects.filter(
             Q(title__icontains=q) |
@@ -22,10 +25,10 @@ def home(request):
     else:
         books = Book.objects.all().order_by('-created_at')
     wishlists = Wishlist.objects.filter(user=request.user).order_by('-created_at')[:3]
-    print(wishlists)
     context = {
         "books": books,
-        "wishlists": wishlists
+        "wishlists": wishlists,
+        "recommended_book": recommended_book
     }
     return render(request, 'books/main.html', context=context)
 
@@ -59,22 +62,57 @@ def book_detail(request, book_id):
     return render(request, 'books/details.html', context=context)
 
 def recommendation(request):
+    user_prompt = request.POST.get('prompt')
     wishlist_books = Book.objects.filter(wishlist__user=request.user)
-    user_preferred_categories = Category.objects.filter(books__in=wishlist_books).values_list('name', flat=True).distinct()
-    if not user_preferred_categories:
+
+    if not wishlist_books:
+        context = {
+            "response": []
+        }
+        return render(request, 'books/recommendation.html', context=context)
+
+    if not wishlist_books.exists():
         response = []
     else:
+        books_info = [
+            {
+                "title": book.title,
+                "author": book.author.full_name,
+                "genre": [category.name for category in book.categories.all()],
+                "summary": book.description
+            }
+            for book in wishlist_books
+        ]
 
         prompt = f"""
-            Based on the following user preferences, recommend 5 books. 
-            Return the data as a JSON array of dictionaries with keys: title, author, genre, summary, cover_url so I use in python
-            If no real image URL is available, use 'https://example.com/cover.jpg'.
+            Based on the following books a user liked, recommend 5 similar books. 
+            Do not limit by genre. Instead, focus on writing style, themes, and content similarity.
+            Return the results as a JSON array of dictionaries with the following keys: 
+            "title", "author", "genre" (as an array of strings), "summary", "cover_url", movie_name (if exists).
+            Only use real, working cover_url from public sites !!!.
+            If not available, use 'https://example.com/cover.jpg'.
 
-            User preferences: {user_preferred_categories}
-            """
-        response = get_gpt_response(prompt=prompt)
+            User liked books: {json.dumps(books_info, indent=2)}
+        """
+    if user_prompt:
+        default_prompt = """
+            Return the results as a JSON array of dictionaries with the following keys: 
+            "title", "author", "genre" (as an array of strings), "summary", "cover_url", movie_name (if exists).
+            Only use real, working cover_url from public sites !!!.
+            If not available, use 'https://example.com/cover.jpg'.
+        """
+        prompt = user_prompt + default_prompt
+    response = get_gpt_response(prompt=prompt)
+    data = json.loads(response)
+    # Choose one random book and store it in the session
+    if response:
+        print(response)
+        print("Storing in recommended_book")
+        random_book = random.choice(data)
+        print("RANDOM BOOK", random_book)
+        request.session['recommended_book'] = random_book
 
     context = {
-        "response": json.loads(response)
+        "response": data if response else []
     }
     return render(request, 'books/recommendation.html', context=context)

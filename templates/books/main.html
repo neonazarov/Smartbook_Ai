@@ -20,6 +20,11 @@
     object-fit: cover;
 }
 
+.book-summary {
+    font-size: 25px;
+    color: #fff;
+    margin-top: 10px;
+}
 
 </style>
 <div class="container">
@@ -33,7 +38,8 @@
             <div class="col-lg-7">
               <div class="header-text">
                 <h6>Welcome To BookStore</h6>
-                <h4><em>Browse</em> Our Popular Books Here</h4>
+                <h4><em>{{ recommended_book.title }}</em></h4>
+                <p class="book-summary">{{ recommended_book.summary }}</p>
                 <div class="main-button">
                   <a href="{% url 'books:home' %}">Browse Now</a>
                 </div>
